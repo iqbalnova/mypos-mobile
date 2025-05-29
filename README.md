@@ -31,7 +31,11 @@ Klik di bawah ini untuk langsung mencoba aplikasinya di Android:
    - Tambahkan produk ke keranjang menggunakan **local database** (Sqflite) & **BLoC**.
 
 6. 💸 **Transaksi Pembelian**
+
    - Proses transaksi pembayaran dengan manajemen state menggunakan **BLoC**.
+
+7. 🌙 **Dark Mode / Light Mode Otomatis**
+   - Tampilan mengikuti **system settings** pada perangkat pengguna.
 
 ---
 
@@ -43,6 +47,7 @@ Klik di bawah ini untuk langsung mencoba aplikasinya di Android:
 - 🌐 **HTTP** (Networking)
 - 🖼️ **Image Picker** (Upload gambar produk)
 - 🧱 **Modular Structure** per fitur
+- 🌗 **Theme Mode Adaptation** (Dark & Light)
 - 🧪 Siap dikembangkan untuk pengujian unit & widget
 
 ---
