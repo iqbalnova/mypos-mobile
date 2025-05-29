@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../product/presentation/bloc/product_bloc.dart';
 import '../../../product/presentation/pages/home_page.dart';
 import '../../../product/presentation/widgets/add_category_sheet.dart';
-import '../../../product/presentation/widgets/add_product_sheet.dart';
+import '../../../product/presentation/widgets/add_edit_product_sheet.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 import '../../common/styles.dart';
+import '../../injection.dart' as di;
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
@@ -33,12 +36,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return HomePage(
-          onProfileTabSelected: () {
-            setState(() {
-              _currentIndex = 1;
-            });
-          },
+        return BlocProvider(
+          create: (context) => di.locator<ProductBloc>(),
+          child: HomePage(
+            onProfileTabSelected: () {
+              setState(() {
+                _currentIndex = 1;
+              });
+            },
+          ),
         );
       case 1:
         return const ProfilePage();
@@ -146,8 +152,16 @@ class _MainScreenState extends State<MainScreen> {
                                               context: context,
                                               isScrollControlled: true,
                                               builder:
-                                                  (context) =>
-                                                      const AddCategorySheet(),
+                                                  (context) => BlocProvider(
+                                                    create:
+                                                        (context) =>
+                                                            di
+                                                                .locator<
+                                                                  ProductBloc
+                                                                >(),
+                                                    child:
+                                                        const AddCategorySheet(),
+                                                  ),
                                             );
                                           },
                                         ),
@@ -161,8 +175,16 @@ class _MainScreenState extends State<MainScreen> {
                                               context: context,
                                               isScrollControlled: true,
                                               builder:
-                                                  (context) =>
-                                                      const AddProductSheet(),
+                                                  (context) => BlocProvider(
+                                                    create:
+                                                        (context) =>
+                                                            di
+                                                                .locator<
+                                                                  ProductBloc
+                                                                >(),
+                                                    child:
+                                                        const AddEditProductSheet(),
+                                                  ),
                                             );
                                           },
                                         ),

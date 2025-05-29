@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import '../bloc/product_bloc.dart';
-import '../widgets/add_product_sheet.dart';
+import '../widgets/add_edit_product_sheet.dart';
 import '../widgets/category_selector.dart';
 
 import '../../../core/common/styles.dart';
@@ -108,15 +108,8 @@ class _ListProductPageState extends State<ListProductPage> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            SliverToBoxAdapter(
-              child: BlocProvider(
-                create:
-                    (context) =>
-                        widget.locator<ProductBloc>()
-                          ..add(FetchProductsEvent()),
-                child: _buildSaleProducts(),
-              ),
-            ),
+            SliverToBoxAdapter(child: _buildSaleProducts()),
+
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
           ],
         ),
@@ -125,41 +118,49 @@ class _ListProductPageState extends State<ListProductPage> {
   }
 
   Widget _buildSaleProducts() {
-    return BlocListener<ProductBloc, ProductState>(
-      listener: (context, state) {
-        if (state is DeleteProductSuccess) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Produk berhasil dihapus')));
-        } else if (state is DeleteProductFailure) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Gagal menghapus produk')));
-        }
-      },
-      child: BlocBuilder<ProductBloc, ProductState>(
-        buildWhen:
-            (prev, curr) =>
-                curr is ProductLoaded ||
-                curr is ProductLoading ||
-                curr is ProductError,
-        builder: (context, state) {
-          if (state is ProductLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ProductLoaded) {
-            // Simpan hasil awal hanya sekali
-            if (_allProducts.isEmpty) {
-              _allProducts = state.products;
-              _filteredProducts = _allProducts;
-            }
-
-            return _buildProductGrid(_filteredProducts);
-          } else if (state is ProductError) {
-            return Center(child: Text(state.message));
-          } else {
-            return const SizedBox.shrink();
+    return BlocProvider(
+      create:
+          (context) => widget.locator<ProductBloc>()..add(FetchProductsEvent()),
+      child: BlocListener<ProductBloc, ProductState>(
+        listener: (context, state) {
+          if (state is DeleteProductSuccess) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Produk berhasil dihapus')));
+            setState(() {
+              _allProducts = [];
+            });
+            context.read<ProductBloc>().add(FetchProductsEvent());
+          } else if (state is DeleteProductFailure) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Gagal menghapus produk')));
           }
         },
+        child: BlocBuilder<ProductBloc, ProductState>(
+          buildWhen:
+              (prev, curr) =>
+                  curr is ProductLoaded ||
+                  curr is ProductLoading ||
+                  curr is ProductError,
+          builder: (context, state) {
+            if (state is ProductLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ProductLoaded) {
+              // Simpan hasil awal hanya sekali
+              if (_allProducts.isEmpty) {
+                _allProducts = state.products;
+                _filteredProducts = _allProducts;
+              }
+
+              return _buildProductGrid(_filteredProducts);
+            } else if (state is ProductError) {
+              return Center(child: Text(state.message));
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
       ),
     );
   }
@@ -198,7 +199,7 @@ class _ListProductPageState extends State<ListProductPage> {
                 builder:
                     (_) => BlocProvider(
                       create: (context) => widget.locator<ProductBloc>(),
-                      child: AddProductSheet(product: product),
+                      child: AddEditProductSheet(product: product),
                     ),
               ).then((result) {
                 if (result == true) {

@@ -4,22 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../core/common/styles.dart';
 import '../../../core/injection.dart' as di;
 import '../../../core/presentation/widgets/dashed_border.dart';
+import '../../../core/router/app_routes.dart';
 import '../../data/models/product_form_model.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/product.dart';
 import '../bloc/product_bloc.dart';
 
-class AddProductSheet extends StatefulWidget {
+class AddEditProductSheet extends StatefulWidget {
   final Product? product;
-  const AddProductSheet({super.key, this.product});
+  const AddEditProductSheet({super.key, this.product});
 
   @override
-  State<AddProductSheet> createState() => _AddProductSheetState();
+  State<AddEditProductSheet> createState() => _AddEditProductSheetState();
 }
 
-class _AddProductSheetState extends State<AddProductSheet> {
+class _AddEditProductSheetState extends State<AddEditProductSheet> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -112,10 +114,11 @@ class _AddProductSheetState extends State<AddProductSheet> {
     return BlocListener<ProductBloc, ProductState>(
       listener: (context, state) {
         if (state is AddProductSuccess) {
-          Navigator.pop(context, true);
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Produk berhasil ditambahkan')),
           );
+          Navigator.pushNamed(context, AppRoutes.listProduct);
         } else if (state is UpdateProductSuccess) {
           Navigator.pop(context, true);
           ScaffoldMessenger.of(
@@ -337,13 +340,30 @@ class _AddProductSheetState extends State<AddProductSheet> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   // Buttons
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primaryLight,
+                            side: const BorderSide(
+                              color: AppColors.primaryLight,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // Rounded button
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                            ), // tinggi tombol
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                           child: const Text('Batal'),
                         ),
                       ),
@@ -352,7 +372,18 @@ class _AddProductSheetState extends State<AddProductSheet> {
                         child: ElevatedButton(
                           onPressed: _submit,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: AppColors.primaryLight,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // Rounded button
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           child: Text(
                             isEditing ? 'Simpan Perubahan' : 'Tambah',

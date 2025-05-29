@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/common/styles.dart';
+import '../../../core/common/utils.dart';
 import '../../../core/injection.dart' as di;
 import '../../../core/router/app_routes.dart';
 import '../bloc/product_bloc.dart';
-import '../widgets/add_product_sheet.dart';
+import '../widgets/add_edit_product_sheet.dart';
 import '../widgets/banner_widget.dart';
 import '../widgets/product_card.dart';
 
@@ -18,7 +19,28 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with RouteAware {
+  void _fetchProducts() {
+    context.read<ProductBloc>().add(FetchProductsEvent());
+  }
+
+  @override
+  void initState() {
+    _fetchProducts();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void didPopNext() {
+    _fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,88 +116,90 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: BlocProvider(
-              create:
-                  (context) =>
-                      di.locator<ProductBloc>()..add(FetchProductsEvent()),
-              child: BlocListener<ProductBloc, ProductState>(
-                listener: (context, state) {
-                  if (state is DeleteProductSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Produk berhasil dihapus')),
+            child: BlocListener<ProductBloc, ProductState>(
+              listener: (context, state) {
+                if (state is DeleteProductSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Produk berhasil dihapus')),
+                  );
+                  context.read<ProductBloc>().add(FetchProductsEvent());
+                } else if (state is DeleteProductFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Gagal menghapus produk')),
+                  );
+                }
+              },
+              child: BlocBuilder<ProductBloc, ProductState>(
+                builder: (context, state) {
+                  if (state is ProductLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is ProductLoaded) {
+                    final products = state.products;
+                    return GridView.builder(
+                      itemCount: products.length > 5 ? 5 : products.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200.w,
+                        mainAxisSpacing: 16.h,
+                        crossAxisSpacing: 16.w,
+                        childAspectRatio: 0.6,
+                      ),
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return ProductCard(
+                          imageUrl: product.pictureUrl,
+                          title: product.name,
+                          price: product.price,
+                          onTap: () async {
+                            await showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder:
+                                  (_) => BlocProvider(
+                                    create:
+                                        (context) => di.locator<ProductBloc>(),
+                                    child: AddEditProductSheet(
+                                      product: product,
+                                    ),
+                                  ),
+                            ).then((result) {
+                              if (result == true) {
+                                // ignore: use_build_context_synchronously
+                                context.read<ProductBloc>().add(
+                                  FetchProductsEvent(),
+                                );
+                              }
+                            });
+                          },
+                          onAddToCart: () {
+                            // handle add to cart
+                          },
+                          onDelete: () {
+                            context.read<ProductBloc>().add(
+                              DeleteProductEvent(product.id),
+                            );
+                          },
+                        );
+                      },
                     );
-                    context.read<ProductBloc>().add(FetchProductsEvent());
-                  } else if (state is DeleteProductFailure) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Gagal menghapus produk')),
-                    );
+                  } else if (state is ProductError) {
+                    return Center(child: Text(state.message));
+                  } else {
+                    return const SizedBox.shrink();
                   }
                 },
-                child: BlocBuilder<ProductBloc, ProductState>(
-                  builder: (context, state) {
-                    if (state is ProductLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is ProductLoaded) {
-                      final products = state.products;
-                      return GridView.builder(
-                        itemCount: products.length > 5 ? 5 : products.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 200.w,
-                          mainAxisSpacing: 16.h,
-                          crossAxisSpacing: 16.w,
-                          childAspectRatio: 0.6,
-                        ),
-                        itemBuilder: (context, index) {
-                          final product = products[index];
-                          return ProductCard(
-                            imageUrl: product.pictureUrl,
-                            title: product.name,
-                            price: product.price,
-                            onTap: () async {
-                              await showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                builder:
-                                    (_) => BlocProvider(
-                                      create:
-                                          (context) =>
-                                              di.locator<ProductBloc>(),
-                                      child: AddProductSheet(product: product),
-                                    ),
-                              ).then((result) {
-                                if (result == true) {
-                                  // ignore: use_build_context_synchronously
-                                  context.read<ProductBloc>().add(
-                                    FetchProductsEvent(),
-                                  );
-                                }
-                              });
-                            },
-                            onAddToCart: () {
-                              // handle add to cart
-                            },
-                            onDelete: () {
-                              context.read<ProductBloc>().add(
-                                DeleteProductEvent(product.id),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    } else if (state is ProductError) {
-                      return Center(child: Text(state.message));
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  },
-                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
   }
 }
