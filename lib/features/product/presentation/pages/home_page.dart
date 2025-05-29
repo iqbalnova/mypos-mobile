@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/common/data_constant.dart';
 import '../../../core/common/styles.dart';
+import '../../../core/injection.dart' as di;
 import '../../../core/router/app_routes.dart';
+import '../bloc/product_bloc.dart';
+import '../widgets/add_product_sheet.dart';
 import '../widgets/banner_widget.dart';
 import '../widgets/product_card.dart';
-import '../widgets/search_bar_widget.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onProfileTabSelected;
@@ -48,15 +50,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            SliverToBoxAdapter(
-              child: SearchBarWidget(
-                readOnly: true,
-                onTap:
-                    () => Navigator.pushNamed(context, AppRoutes.listProduct),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
             const SliverToBoxAdapter(child: BannerWidget()),
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
             SliverToBoxAdapter(child: _buildSaleProducts()),
@@ -100,27 +94,84 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GridView.builder(
-              itemCount: dummyProducts.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200.w,
-                mainAxisSpacing: 16.h,
-                crossAxisSpacing: 16.w,
-                childAspectRatio: 0.6,
-              ),
-              itemBuilder: (context, index) {
-                final product = dummyProducts[index];
-                return ProductCard(
-                  imageUrl: product.pictureUrl,
-                  title: product.name,
-                  price: product.price,
-                  onAddToCart: () {
-                    // handle add to cart
+            child: BlocProvider(
+              create:
+                  (context) =>
+                      di.locator<ProductBloc>()..add(FetchProductsEvent()),
+              child: BlocListener<ProductBloc, ProductState>(
+                listener: (context, state) {
+                  if (state is DeleteProductSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Produk berhasil dihapus')),
+                    );
+                    context.read<ProductBloc>().add(FetchProductsEvent());
+                  } else if (state is DeleteProductFailure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Gagal menghapus produk')),
+                    );
+                  }
+                },
+                child: BlocBuilder<ProductBloc, ProductState>(
+                  builder: (context, state) {
+                    if (state is ProductLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is ProductLoaded) {
+                      final products = state.products;
+                      return GridView.builder(
+                        itemCount: products.length > 5 ? 5 : products.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 200.w,
+                          mainAxisSpacing: 16.h,
+                          crossAxisSpacing: 16.w,
+                          childAspectRatio: 0.6,
+                        ),
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          return ProductCard(
+                            imageUrl: product.pictureUrl,
+                            title: product.name,
+                            price: product.price,
+                            onTap: () async {
+                              await showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder:
+                                    (_) => BlocProvider(
+                                      create:
+                                          (context) =>
+                                              di.locator<ProductBloc>(),
+                                      child: AddProductSheet(product: product),
+                                    ),
+                              ).then((result) {
+                                if (result == true) {
+                                  // ignore: use_build_context_synchronously
+                                  context.read<ProductBloc>().add(
+                                    FetchProductsEvent(),
+                                  );
+                                }
+                              });
+                            },
+                            onAddToCart: () {
+                              // handle add to cart
+                            },
+                            onDelete: () {
+                              context.read<ProductBloc>().add(
+                                DeleteProductEvent(product.id),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    } else if (state is ProductError) {
+                      return Center(child: Text(state.message));
+                    } else {
+                      return const SizedBox.shrink();
+                    }
                   },
-                );
-              },
+                ),
+              ),
             ),
           ),
         ],

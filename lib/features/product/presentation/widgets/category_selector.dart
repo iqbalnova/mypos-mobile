@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/router/app_routes.dart';
+import '../../domain/entities/category.dart';
 import '../bloc/product_bloc.dart';
 
 class CategorySelector extends StatefulWidget {
-  const CategorySelector({super.key});
+  final ValueChanged<Category> onCategorySelected;
+
+  const CategorySelector({super.key, required this.onCategorySelected});
 
   @override
   State<CategorySelector> createState() => _CategorySelectorState();
@@ -24,7 +27,10 @@ class _CategorySelectorState extends State<CategorySelector> {
           if (state is CategoryLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CategoryLoaded) {
-            final categories = state.categories;
+            final categories = [
+              const Category(id: '0', name: 'Semua Kategori'),
+              ...state.categories,
+            ];
 
             return Row(
               children: [
@@ -40,7 +46,7 @@ class _CategorySelectorState extends State<CategorySelector> {
                           setState(() {
                             _selectedIndex = index;
                           });
-                          // Trigger filter event or other category selection logic
+                          widget.onCategorySelected(category);
                         },
                         child: Container(
                           margin: const EdgeInsets.only(right: 12),

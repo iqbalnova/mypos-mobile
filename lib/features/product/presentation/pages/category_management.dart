@@ -343,7 +343,6 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                   decoration: InputDecoration(
                     labelText: 'Nama kategori',
                     filled: true,
-                    // fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

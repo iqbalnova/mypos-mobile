@@ -1,4 +1,6 @@
-class Product {
+import 'package:equatable/equatable.dart';
+
+class Product extends Equatable {
   final String id;
   final String categoryId;
   final String name;
@@ -19,19 +21,15 @@ class Product {
     this.deletedAt,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      categoryId: json['category_id'],
-      name: json['name'],
-      price: json['price'],
-      pictureUrl: json['picture_url'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      deletedAt:
-          json['deleted_at'] != null
-              ? DateTime.parse(json['deleted_at'])
-              : null,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    id,
+    categoryId,
+    name,
+    price,
+    pictureUrl,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
 }

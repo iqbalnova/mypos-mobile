@@ -7,10 +7,7 @@ abstract class ProductState extends Equatable {
   List<Object?> get props => [];
 }
 
-class ProductInitial extends ProductState {}
-
-class ProductLoading extends ProductState {}
-
+// CATEGORY
 class CategoryLoading extends ProductState {}
 
 class CategoryLoaded extends ProductState {
@@ -71,6 +68,53 @@ class DeleteCategoryFailure extends ProductState {
   final String message;
 
   const DeleteCategoryFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+// PRODUCT
+class ProductInitial extends ProductState {}
+
+class ProductLoading extends ProductState {}
+
+class ProductLoaded extends ProductState {
+  final List<Product> products;
+
+  const ProductLoaded(this.products);
+
+  @override
+  List<Object?> get props => [products];
+}
+
+class AddProductSuccess extends ProductState {}
+
+class UpdateProductSuccess extends ProductState {}
+
+class DeleteProductSuccess extends ProductState {}
+
+class AddProductFailure extends ProductState {
+  final String message;
+
+  const AddProductFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class UpdateProductFailure extends ProductState {
+  final String message;
+
+  const UpdateProductFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class DeleteProductFailure extends ProductState {
+  final String message;
+
+  const DeleteProductFailure(this.message);
 
   @override
   List<Object?> get props => [message];

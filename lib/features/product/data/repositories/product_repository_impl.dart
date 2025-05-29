@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+
 import '../../../core/common/exception.dart';
-import '../../domain/entities/category.dart';
 import '../../../core/common/failure.dart';
+import '../../domain/entities/category.dart';
+import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_datasource.dart';
+import '../models/product_form_model.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource remoteDataSource;
@@ -42,7 +45,6 @@ class ProductRepositoryImpl implements ProductRepository {
       await remoteDataSource.updateCategory(id, name);
       return const Right(null);
     } on ServerException catch (e) {
-      print(e.message);
       return Left(ServerFailure(e.message));
     } on SocketException {
       return Left(ConnectionFailure('Failed to connect to the network'));
@@ -53,6 +55,61 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Either<Failure, void>> deleteCategory(String id) async {
     try {
       await remoteDataSource.deleteCategory(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on SocketException {
+      return Left(ConnectionFailure('Failed to connect to the network'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Product>>> getProducts() async {
+    try {
+      final result = await remoteDataSource.getProducts();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on SocketException {
+      return Left(ConnectionFailure('Failed to connect to the network'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> addProduct(
+    ProductFormModel formModel,
+    File imageFile,
+  ) async {
+    try {
+      await remoteDataSource.addProduct(formModel, imageFile);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on SocketException {
+      return Left(ConnectionFailure('Failed to connect to the network'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateProduct(
+    String id,
+    ProductFormModel formModel,
+    File? imageFile,
+  ) async {
+    try {
+      await remoteDataSource.updateProduct(id, formModel, imageFile);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } on SocketException {
+      return Left(ConnectionFailure('Failed to connect to the network'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteProduct(String id) async {
+    try {
+      await remoteDataSource.deleteProduct(id);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

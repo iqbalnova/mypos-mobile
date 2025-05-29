@@ -1,3 +1,8 @@
+import '../product/domain/usecases/add_products.dart';
+import '../product/domain/usecases/delete_products.dart';
+import '../product/domain/usecases/get_products.dart';
+import '../product/domain/usecases/update_products.dart';
+
 import '../auth/data/datasources/auth_remote_datasource.dart';
 import '../auth/domain/repositories/auth_repository.dart';
 import '../auth/domain/usecases/login_usecase.dart';
@@ -35,6 +40,10 @@ Future<void> init() async {
       addCategory: locator(),
       updateCategory: locator(),
       deleteCategory: locator(),
+      getProducts: locator(),
+      addProduct: locator(),
+      updateProduct: locator(),
+      deleteProduct: locator(),
     ),
   );
 
@@ -44,6 +53,11 @@ Future<void> init() async {
   locator.registerLazySingleton(() => AddCategory(locator()));
   locator.registerLazySingleton(() => UpdateCategory(locator()));
   locator.registerLazySingleton(() => DeleteCategory(locator()));
+
+  locator.registerLazySingleton(() => GetProducts(locator()));
+  locator.registerLazySingleton(() => AddProduct(locator()));
+  locator.registerLazySingleton(() => UpdateProduct(locator()));
+  locator.registerLazySingleton(() => DeleteProduct(locator()));
 
   // repository
   locator.registerLazySingleton<AuthRepository>(
