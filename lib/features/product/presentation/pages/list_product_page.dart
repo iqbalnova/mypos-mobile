@@ -64,7 +64,8 @@ class _ListProductPageState extends State<ListProductPage> {
               child: BlocProvider(
                 create:
                     (context) =>
-                        widget.locator<ProductBloc>()..add(FetchCategories()),
+                        widget.locator<ProductBloc>()
+                          ..add(FetchCategoriesEvent()),
                 child: CategorySelector(),
               ),
             ),

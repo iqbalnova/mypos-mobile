@@ -7,5 +7,6 @@ class AppRoutes {
   static const String qrisPayment = "/qris-payment";
   static const String paymentSuccess = "/payment-success";
   static const String listProduct = "/list-product";
+  static const String categoryManagement = "/category-management";
   static const String comingSoon = "/coming";
 }

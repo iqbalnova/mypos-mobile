@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:myposapp/features/core/injection.dart' as di;
-import 'package:myposapp/features/core/presentation/pages/main_screen.dart';
-import 'package:myposapp/features/core/presentation/pages/splash_screen.dart';
-import 'package:myposapp/features/product/presentation/pages/cart_page.dart';
-import 'package:myposapp/features/product/presentation/pages/list_product_page.dart';
-import 'package:myposapp/features/product/presentation/pages/payment_success.dart';
-import 'package:myposapp/features/product/presentation/pages/qris_payment_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/presentation/pages/login_page.dart';
 import '../../auth/presentation/pages/onboarding_page.dart';
+import '../../product/presentation/bloc/product_bloc.dart';
+import '../../product/presentation/pages/cart_page.dart';
+import '../../product/presentation/pages/category_management.dart';
+import '../../product/presentation/pages/list_product_page.dart';
+import '../../product/presentation/pages/payment_success.dart';
+import '../../product/presentation/pages/qris_payment_page.dart';
+import '../injection.dart' as di;
 import '../presentation/pages/coming_soon_page.dart';
+import '../presentation/pages/main_screen.dart';
+import '../presentation/pages/splash_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
@@ -32,6 +35,12 @@ class AppRouter {
         break;
       case AppRoutes.listProduct:
         page = ListProductPage(locator: di.locator);
+        break;
+      case AppRoutes.categoryManagement:
+        page = BlocProvider(
+          create: (context) => di.locator<ProductBloc>(),
+          child: CategoryManagementPage(locator: di.locator),
+        );
         break;
       case AppRoutes.cart:
         page = const CartPage();

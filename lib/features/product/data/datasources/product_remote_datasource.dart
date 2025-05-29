@@ -6,6 +6,9 @@ import '../models/category_model.dart';
 
 abstract class ProductRemoteDataSource {
   Future<List<CategoryModel>> getCategories();
+  Future<void> addCategory(String name);
+  Future<void> updateCategory(String id, String name);
+  Future<void> deleteCategory(String id);
 }
 
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
@@ -41,6 +44,41 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
       final error =
           json.decode(response.body)['message'] ?? 'Get Categories Failed';
       throw ServerException(error);
+    }
+  }
+
+  @override
+  Future<void> addCategory(String name) async {
+    final response = await client.post(
+      Uri.parse('https://mas-pos.appmedia.id/api/v1/category'),
+      headers: await _getHeaders(),
+      body: jsonEncode({'name': name}),
+    );
+    if (response.statusCode != 200) {
+      throw ServerException('Failed to add category');
+    }
+  }
+
+  @override
+  Future<void> updateCategory(String id, String name) async {
+    final response = await client.put(
+      Uri.parse('https://mas-pos.appmedia.id/api/v1/category/$id'),
+      headers: await _getHeaders(),
+      body: jsonEncode({'name': name}),
+    );
+    if (response.statusCode != 200) {
+      throw ServerException('Failed to update category');
+    }
+  }
+
+  @override
+  Future<void> deleteCategory(String id) async {
+    final response = await client.delete(
+      Uri.parse('https://mas-pos.appmedia.id/api/v1/category/$id'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode != 200) {
+      throw ServerException('Failed to delete category');
     }
   }
 }

@@ -7,7 +7,10 @@ import '../auth/data/repositories/auth_repository_impl.dart';
 import '../product/data/datasources/product_remote_datasource.dart';
 import '../product/data/repositories/product_repository_impl.dart';
 import '../product/domain/repositories/product_repository.dart';
+import '../product/domain/usecases/add_category.dart';
+import '../product/domain/usecases/delete_category.dart';
 import '../product/domain/usecases/get_categories.dart';
+import '../product/domain/usecases/update_category.dart';
 import '../product/presentation/bloc/product_bloc.dart';
 import 'helper/secure_storage_helper.dart';
 import 'router/app_router.dart';
@@ -26,11 +29,21 @@ Future<void> init() async {
 
   // BLoC
   locator.registerFactory(() => AuthBloc(loginUseCase: locator()));
-  locator.registerFactory(() => ProductBloc(getCategories: locator()));
+  locator.registerFactory(
+    () => ProductBloc(
+      getCategories: locator(),
+      addCategory: locator(),
+      updateCategory: locator(),
+      deleteCategory: locator(),
+    ),
+  );
 
   // use case
   locator.registerLazySingleton(() => LoginUseCase(locator()));
   locator.registerLazySingleton(() => GetCategories(locator()));
+  locator.registerLazySingleton(() => AddCategory(locator()));
+  locator.registerLazySingleton(() => UpdateCategory(locator()));
+  locator.registerLazySingleton(() => DeleteCategory(locator()));
 
   // repository
   locator.registerLazySingleton<AuthRepository>(
