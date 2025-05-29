@@ -40,7 +40,6 @@ class SearchBarWidget extends StatelessWidget {
             readOnly: readOnly,
             onTap: onTap,
             onChanged: onChanged,
-            style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
               prefixIcon: const Icon(
                 Icons.search,

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:myposapp/features/product/domain/entities/category.dart';
 
+import '../../../core/common/styles.dart';
 import '../bloc/product_bloc.dart';
 
 class CategoryManagementPage extends StatefulWidget {
@@ -28,13 +29,10 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Atur Kategori'),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shadowColor: Colors.black.withValues(alpha: 0.1),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
       body: Column(
         children: [
@@ -44,12 +42,10 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Semua Kategori',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                  style: AppTextStyle.subtitle2(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const Spacer(),
@@ -169,21 +165,20 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text(
+                          Text(
                             'Belum ada kategori',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                            style: AppTextStyle.headline3(
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tambahkan kategori pertama Anda di atas untuk memulai',
+                            'Tambahkan kategori pertama Anda\n di main page untuk memulai',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -198,7 +193,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
@@ -339,16 +334,16 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Update the category name',
+                  'Perbarui nama kategori',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: controller,
                   decoration: InputDecoration(
-                    labelText: 'Category name',
+                    labelText: 'Nama kategori',
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    // fillColor: Colors.grey[50],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -361,7 +356,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: const Text('Batal'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -378,7 +373,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Save Changes'),
+                child: const Text('Simpan'),
               ),
             ],
           ),
@@ -386,7 +381,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   }
 
   void _showDeleteDialog(dynamic category) {
-    final productBloc = context.read<ProductBloc>(); // Get bloc instance
+    final productBloc = context.read<ProductBloc>();
 
     showDialog(
       context: context,
@@ -417,7 +412,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'This will permanently delete "${category.name}"',
+                          'Ini akan menghapus secara permanen "${category.name}"',
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -426,7 +421,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'This action cannot be undone. Are you sure you want to continue?',
+                  'Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin melanjutkan?',
                   style: TextStyle(color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
@@ -435,7 +430,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: const Text('Batal'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -449,7 +444,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Delete'),
+                child: const Text('Hapus'),
               ),
             ],
           ),

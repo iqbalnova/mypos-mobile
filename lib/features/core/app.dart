@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: !kDebugMode,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
-          themeMode: ThemeMode.light,
+          themeMode: ThemeMode.dark,
           navigatorObservers: [routeObserver],
           onGenerateRoute: GetIt.instance<AppRouter>().onGenerateRoute,
         );
