@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
+import 'package:myposapp/features/product/presentation/bloc/product_bloc.dart';
 import 'package:myposapp/features/product/presentation/widgets/category_selector.dart';
 
 import '../../../core/common/data_constant.dart';
@@ -9,7 +12,8 @@ import '../widgets/product_card.dart';
 import '../widgets/search_bar_widget.dart';
 
 class ListProductPage extends StatefulWidget {
-  const ListProductPage({super.key});
+  final GetIt locator;
+  const ListProductPage({super.key, required this.locator});
 
   @override
   State<ListProductPage> createState() => _ListProductPageState();
@@ -56,7 +60,14 @@ class _ListProductPageState extends State<ListProductPage> {
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             const SliverToBoxAdapter(child: SearchBarWidget()),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            const SliverToBoxAdapter(child: CategorySelector()),
+            SliverToBoxAdapter(
+              child: BlocProvider(
+                create:
+                    (context) =>
+                        widget.locator<ProductBloc>()..add(FetchCategories()),
+                child: CategorySelector(),
+              ),
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
             SliverToBoxAdapter(child: _buildSaleProducts()),
             const SliverToBoxAdapter(child: SizedBox(height: 16)),

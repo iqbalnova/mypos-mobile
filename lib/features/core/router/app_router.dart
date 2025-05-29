@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myposapp/features/core/injection.dart' as di;
 import 'package:myposapp/features/core/presentation/pages/main_screen.dart';
 import 'package:myposapp/features/core/presentation/pages/splash_screen.dart';
 import 'package:myposapp/features/product/presentation/pages/cart_page.dart';
@@ -30,7 +31,7 @@ class AppRouter {
         page = MainScreen(initialIndex: initialIndex);
         break;
       case AppRoutes.listProduct:
-        page = const ListProductPage();
+        page = ListProductPage(locator: di.locator);
         break;
       case AppRoutes.cart:
         page = const CartPage();

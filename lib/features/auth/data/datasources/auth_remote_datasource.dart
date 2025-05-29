@@ -21,7 +21,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
       return UserModel.fromJson(jsonDecode(response.body));
     } else {
       final error = json.decode(response.body)['message'] ?? 'Login failed';

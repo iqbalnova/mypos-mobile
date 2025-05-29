@@ -4,6 +4,11 @@ import '../auth/domain/usecases/login_usecase.dart';
 import '../auth/presentation/bloc/auth_bloc.dart';
 
 import '../auth/data/repositories/auth_repository_impl.dart';
+import '../product/data/datasources/product_remote_datasource.dart';
+import '../product/data/repositories/product_repository_impl.dart';
+import '../product/domain/repositories/product_repository.dart';
+import '../product/domain/usecases/get_categories.dart';
+import '../product/presentation/bloc/product_bloc.dart';
 import 'helper/secure_storage_helper.dart';
 import 'router/app_router.dart';
 import 'package:get_it/get_it.dart';
@@ -21,17 +26,28 @@ Future<void> init() async {
 
   // BLoC
   locator.registerFactory(() => AuthBloc(loginUseCase: locator()));
+  locator.registerFactory(() => ProductBloc(getCategories: locator()));
 
   // use case
   locator.registerLazySingleton(() => LoginUseCase(locator()));
+  locator.registerLazySingleton(() => GetCategories(locator()));
 
   // repository
   locator.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: locator()),
   );
+  locator.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(remoteDataSource: locator()),
+  );
 
   // data sources
   locator.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(client: locator()),
+  );
+  locator.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(
+      client: locator(),
+      secureStorageHelper: locator(),
+    ),
   );
 }

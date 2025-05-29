@@ -49,7 +49,13 @@ class _HomePageState extends State<HomePage> {
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            const SliverToBoxAdapter(child: SearchBarWidget()),
+            SliverToBoxAdapter(
+              child: SearchBarWidget(
+                readOnly: true,
+                onTap:
+                    () => Navigator.pushNamed(context, AppRoutes.listProduct),
+              ),
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             const SliverToBoxAdapter(child: BannerWidget()),
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
