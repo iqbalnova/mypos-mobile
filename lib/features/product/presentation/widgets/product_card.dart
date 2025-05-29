@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../core/common/styles.dart';
 
@@ -42,11 +43,30 @@ class ProductCard extends StatelessWidget {
                     top: Radius.circular(12),
                     bottom: Radius.circular(12),
                   ),
-                  child: Image.network(
-                    imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    placeholder:
+                        (context, url) => Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                    errorWidget:
+                        (context, url, error) => Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                          ),
+                        ),
                   ),
                 ),
                 Positioned(

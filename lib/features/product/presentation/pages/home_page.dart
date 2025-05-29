@@ -55,7 +55,12 @@ class _HomePageState extends State<HomePage> with RouteAware {
           IconButton(
             icon: const Icon(Icons.search_outlined),
             color: Theme.of(context).colorScheme.onSurface,
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.comingSoon),
+            onPressed:
+                () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.listProduct,
+                  arguments: {'autofocusSearch': true},
+                ),
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),

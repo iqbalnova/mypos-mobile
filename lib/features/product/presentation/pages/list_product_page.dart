@@ -14,8 +14,14 @@ import '../widgets/product_card.dart';
 import '../widgets/search_bar_widget.dart';
 
 class ListProductPage extends StatefulWidget {
+  final bool autofocusSearch;
   final GetIt locator;
-  const ListProductPage({super.key, required this.locator});
+
+  const ListProductPage({
+    super.key,
+    required this.locator,
+    this.autofocusSearch = false,
+  });
 
   @override
   State<ListProductPage> createState() => _ListProductPageState();
@@ -26,6 +32,24 @@ class _ListProductPageState extends State<ListProductPage> {
   List<Product> _filteredProducts = [];
   Category? _selectedCategory;
   String _searchQuery = '';
+
+  final FocusNode _searchFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autofocusSearch) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _searchFocusNode.requestFocus();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
 
   void _filterProducts() {
     setState(() {
@@ -56,7 +80,10 @@ class _ListProductPageState extends State<ListProductPage> {
           IconButton(
             icon: const Icon(Icons.search_outlined),
             color: Theme.of(context).colorScheme.onSurface,
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.comingSoon),
+            onPressed:
+                () => WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _searchFocusNode.requestFocus();
+                }),
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),
@@ -82,6 +109,7 @@ class _ListProductPageState extends State<ListProductPage> {
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
               child: SearchBarWidget(
+                focusNode: _searchFocusNode,
                 onChanged: (query) {
                   _searchQuery = query;
                   _filterProducts();

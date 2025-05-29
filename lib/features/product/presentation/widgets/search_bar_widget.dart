@@ -6,6 +6,7 @@ class SearchBarWidget extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool readOnly;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String hintText;
 
   const SearchBarWidget({
@@ -14,6 +15,7 @@ class SearchBarWidget extends StatelessWidget {
     this.onChanged,
     this.readOnly = false,
     this.controller,
+    this.focusNode,
     this.hintText = 'Cari nama produk...',
   });
 
@@ -37,7 +39,9 @@ class SearchBarWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: TextField(
             controller: controller,
+            focusNode: focusNode,
             readOnly: readOnly,
+            autofocus: false, // Fokus diatur dari parent via focusNode
             onTap: onTap,
             onChanged: onChanged,
             decoration: InputDecoration(

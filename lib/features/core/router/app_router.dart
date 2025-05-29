@@ -34,7 +34,12 @@ class AppRouter {
         page = MainScreen(initialIndex: initialIndex);
         break;
       case AppRoutes.listProduct:
-        page = ListProductPage(locator: di.locator);
+        final args = settings.arguments as Map<String, dynamic>?;
+        final autofocusSearch = args?['autofocusSearch'] ?? false;
+        page = ListProductPage(
+          locator: di.locator,
+          autofocusSearch: autofocusSearch,
+        );
         break;
       case AppRoutes.categoryManagement:
         page = BlocProvider(
