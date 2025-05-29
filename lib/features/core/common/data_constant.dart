@@ -1,4 +1,3 @@
-import '../../product/domain/entities/cart_item.dart';
 import '../../product/domain/entities/product.dart';
 
 const List<String> categories = [
@@ -56,81 +55,6 @@ final List<Product> dummyProducts = [
         "https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D",
     createdAt: DateTime.parse("2025-03-12T15:45:00.000Z"),
     updatedAt: DateTime.parse("2025-03-12T15:45:00.000Z"),
-  ),
-];
-
-final List<CartItem> cartItems = [
-  CartItem(
-    id: '1',
-    name: 'Pepperoni cheese',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '2',
-    name: 'Pancake',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '3',
-    name: 'Cheese Burger',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '4',
-    name: 'Pepperoni cheese',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '5',
-    name: 'Pancake',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '6',
-    name: 'Cheese Burger',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '7',
-    name: 'Pepperoni cheese',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '8',
-    name: 'Pancake',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
-  ),
-  CartItem(
-    id: '9',
-    name: 'Cheese Burger',
-    image:
-        'https://images.unsplash.com/photo-1647456612962-f081347a1178?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Zm9vZCUyMGFuaW1hdGlvbnxlbnwwfHwwfHx8MA%3D%3D',
-    price: 45000,
-    quantity: 1,
   ),
 ];
 

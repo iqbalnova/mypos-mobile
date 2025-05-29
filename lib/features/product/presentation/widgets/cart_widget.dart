@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:myposapp/features/product/presentation/bloc/product_bloc.dart';
 import '../../domain/entities/cart_item.dart';
-import '../../../core/common/utils.dart';
 
 class CartWidget extends StatelessWidget {
   final CartItem item;
-  final void Function(String id) removeItem;
-  final void Function(String id, bool isIncrement) updateQuantity;
-  const CartWidget({
-    super.key,
-    required this.item,
-    required this.removeItem,
-    required this.updateQuantity,
-  });
+
+  const CartWidget({super.key, required this.item});
+
+  // Format price helper method (you can move this to your utils)
+  String formatPrice(double price) {
+    return 'Rp ${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +21,32 @@ class CartWidget extends StatelessWidget {
       decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
       child: Row(
         children: [
-          // Product Image
+          // Image
           Container(
             width: 60.w,
             height: 60.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.r),
               image: DecorationImage(
-                image: NetworkImage(item.image),
+                image: NetworkImage(item.imageUrl),
                 fit: BoxFit.cover,
               ),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
+            child: Icon(
+              Icons.image,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(width: 12.w),
 
-          // Product Details
+          // Details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.name,
+                  item.productName,
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
@@ -62,7 +67,7 @@ class CartWidget extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  formatPrice(item.price * item.quantity),
+                  formatPrice(item.totalPrice),
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
@@ -73,12 +78,15 @@ class CartWidget extends StatelessWidget {
             ),
           ),
 
-          // Quantity and Delete Controls
+          // Actions
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               InkWell(
-                onTap: () => removeItem(item.id),
+                onTap:
+                    () => context.read<ProductBloc>().add(
+                      RemoveCartItemEvent(item.productId),
+                    ),
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
@@ -98,10 +106,9 @@ class CartWidget extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: 16.h),
 
-              // Quantity Controls
+              // Quantity
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -114,9 +121,11 @@ class CartWidget extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Decrease Button
                     GestureDetector(
-                      onTap: () => updateQuantity(item.id, false),
+                      onTap:
+                          () => context.read<ProductBloc>().add(
+                            DecrementQuantity(item.productId),
+                          ),
                       child: Container(
                         width: 30.w,
                         height: 30.h,
@@ -143,35 +152,24 @@ class CartWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    // Quantity Display
                     Container(
                       width: 40.w,
                       height: 30.h,
-                      decoration: BoxDecoration(
-                        border: Border.symmetric(
-                          vertical: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.3),
-                          ),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${item.quantity}',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${item.quantity}',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
-
-                    // Increase Button
                     GestureDetector(
-                      onTap: () => updateQuantity(item.id, true),
+                      onTap:
+                          () => context.read<ProductBloc>().add(
+                            IncrementQuantity(item.productId),
+                          ),
                       child: Container(
                         width: 30.w,
                         height: 30.h,

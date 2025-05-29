@@ -1,12 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:myposapp/features/product/presentation/widgets/detail_payment_widget.dart';
+import 'package:intl/intl.dart';
+import 'package:myposapp/features/product/presentation/bloc/product_bloc.dart';
+import '../../../core/router/app_routes.dart';
+import '../../domain/entities/cart_item.dart';
+import '../widgets/detail_payment_widget.dart';
 
+import '../../../core/common/data_constant.dart';
 import '../../../core/common/styles.dart';
 
-class PaymentSuccess extends StatelessWidget {
-  final bool? isQrisPay;
-  const PaymentSuccess({super.key, this.isQrisPay = false});
+class PaymentSuccess extends StatefulWidget {
+  final PaymentMethod selectedPaymentMethod;
+  final double totalPrice;
+  final List<CartItem> cartItems;
+
+  const PaymentSuccess({
+    super.key,
+    required this.selectedPaymentMethod,
+    required this.totalPrice,
+    required this.cartItems,
+  });
+
+  @override
+  State<PaymentSuccess> createState() => _PaymentSuccessState();
+}
+
+class _PaymentSuccessState extends State<PaymentSuccess> {
+  @override
+  void initState() {
+    super.initState();
+
+    final productIds = widget.cartItems.map((e) => e.productId).toList();
+    Future.microtask(() {
+      // ignore: use_build_context_synchronously
+      context.read<ProductBloc>().add(BulkRemoveCartItemEvent(productIds));
+    });
+  }
+
+  PaymentMethodType _getPaymentMethodType(String title) {
+    switch (title.toLowerCase()) {
+      case 'qris':
+        return PaymentMethodType.qris;
+      case 'tunai':
+        return PaymentMethodType.cash;
+      default:
+        throw Exception('Unknown payment method: $title');
+    }
+  }
+
+  String _getFormattedDateNow() {
+    final now = DateTime.now();
+    final formatter = DateFormat('dd MMMM yyyy', 'id_ID');
+    return formatter.format(now); // Contoh output: '30 Mei 2025'
+  }
+
+  // Format price helper method
+  String _formatPrice(double price) {
+    return 'Rp ${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +156,12 @@ class PaymentSuccess extends StatelessWidget {
           children: [
             // Close button
             IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed:
+                  () => Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.main,
+                    (route) => false,
+                  ),
               icon: Icon(Icons.close, color: Colors.white, size: 24.sp),
               padding: EdgeInsets.all(12.w),
               constraints: BoxConstraints(minWidth: 44.w, minHeight: 44.h),
@@ -170,10 +227,12 @@ class PaymentSuccess extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8.w),
       child: DetailPaymentWidget(
-        date: '04 September 2024',
+        date: _getFormattedDateNow(),
         transactionId: 'ID 0100jnaka9***',
-        amount: 'Rp224.000',
-        paymentMethod: PaymentMethodType.qris,
+        amount: _formatPrice(widget.totalPrice),
+        paymentMethod: _getPaymentMethodType(
+          widget.selectedPaymentMethod.title,
+        ),
       ),
     );
   }
@@ -183,7 +242,7 @@ class PaymentSuccess extends StatelessWidget {
     // You can use packages like share_plus for sharing
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Share functionality will be implemented here'),
+        content: Text('Fitur berbagi akan segera hadir!'),
         duration: Duration(seconds: 2),
       ),
     );

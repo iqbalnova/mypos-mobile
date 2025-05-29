@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/common/data_constant.dart';
 import '../../../core/common/styles.dart';
-import '../../../core/common/utils.dart';
 import '../../../core/router/app_routes.dart';
+import '../../domain/entities/cart_item.dart';
+import '../bloc/product_bloc.dart';
 import '../widgets/cart_widget.dart';
 
 class CartPage extends StatefulWidget {
@@ -18,29 +20,52 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   PaymentMethod? _selectedPaymentMethod;
 
-  void _updateQuantity(String itemId, bool isIncrement) {
-    setState(() {
-      final index = cartItems.indexWhere((item) => item.id == itemId);
-      if (index != -1) {
-        if (isIncrement) {
-          cartItems[index].quantity++;
-        } else {
-          if (cartItems[index].quantity > 1) {
-            cartItems[index].quantity--;
-          }
-        }
+  // Format price helper method
+  String _formatPrice(double price) {
+    return 'Rp ${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
+
+  void _submitPayment(
+    List<CartItem> cartItems,
+    PaymentMethod? selectedPaymentMethod,
+    double totalPrice,
+  ) {
+    if (cartItems.isNotEmpty && selectedPaymentMethod != null) {
+      if (selectedPaymentMethod.title.toLowerCase() == 'qris') {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.qrisPayment,
+          arguments: {
+            'cartItems': cartItems,
+            'totalPrice': totalPrice,
+            'paymentMethod': selectedPaymentMethod,
+          },
+        );
+      } else if (selectedPaymentMethod.title.toLowerCase() == 'tunai') {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.paymentSuccess,
+          arguments: {
+            'cartItems': cartItems,
+            'totalPrice': totalPrice,
+            'paymentMethod': selectedPaymentMethod,
+          },
+        );
+      } else {
+        // Metode pembayaran tidak dikenali
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Metode pembayaran tidak dikenali.')),
+        );
       }
-    });
-  }
-
-  void _removeItem(String itemId) {
-    setState(() {
-      cartItems.removeWhere((item) => item.id == itemId);
-    });
-  }
-
-  double get _totalPrice {
-    return cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Mohon pilih metode pembayaran dan pastikan keranjang tidak kosong.',
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> showPaymentMethodSheet(BuildContext context) async {
@@ -137,33 +162,139 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        child: Column(
-          children: [
-            // Cart Items List
-            Expanded(
-              child: ListView.separated(
-                itemCount: cartItems.length,
-                separatorBuilder: (context, index) => SizedBox(height: 0.h),
-                itemBuilder: (context, index) {
-                  final item = cartItems[index];
-                  return CartWidget(
-                    item: item,
-                    updateQuantity: _updateQuantity,
-                    removeItem: _removeItem,
-                  );
-                },
+      body: BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+          if (state is CartLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CartError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64.sp,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    'Error loading cart',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    state.message,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16.h),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ProductBloc>().add(LoadCartItems());
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+          } else if (state is CartLoaded) {
+            final cartItems = state.cartItems;
+
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: Column(
+                children: [
+                  // Cart Items List
+                  Expanded(
+                    child:
+                        cartItems.isEmpty
+                            ? _buildEmptyCart()
+                            : ListView.separated(
+                              itemCount: cartItems.length,
+                              separatorBuilder:
+                                  (context, index) => SizedBox(height: 0.h),
+                              itemBuilder: (context, index) {
+                                final item = cartItems[index];
+                                return CartWidget(item: item);
+                              },
+                            ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // Initial state - load cart items
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<ProductBloc>().add(LoadCartItems());
+            });
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
-      bottomNavigationBar: _buildBottomPaymentWidget(),
+      bottomNavigationBar: BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+          if (state is CartLoaded) {
+            return _buildBottomPaymentWidget(state.cartItems, state.totalPrice);
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
     );
   }
 
-  Widget _buildBottomPaymentWidget() {
+  Widget _buildEmptyCart() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.shopping_cart_outlined,
+            size: 80.sp,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            'Keranjang kosong',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            'Tambahkan produk ke keranjang untuk melanjutkan',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomPaymentWidget(
+    List<CartItem> cartItems,
+    double totalPrice,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -293,7 +424,7 @@ class _CartPageState extends State<CartPage> {
                                 ),
                               ),
                               Text(
-                                formatPrice(_totalPrice),
+                                _formatPrice(totalPrice),
                                 style: TextStyle(
                                   fontSize: 16.sp,
                                   fontWeight: FontWeight.bold,
@@ -313,15 +444,11 @@ class _CartPageState extends State<CartPage> {
                     flex: 1,
                     child: ElevatedButton(
                       onPressed:
-                          cartItems.isNotEmpty
-                              ? () {
-                                // Handle payment
-                                Navigator.pushNamed(
-                                  context,
-                                  AppRoutes.qrisPayment,
-                                );
-                              }
-                              : null,
+                          () => _submitPayment(
+                            cartItems,
+                            _selectedPaymentMethod,
+                            totalPrice,
+                          ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor:

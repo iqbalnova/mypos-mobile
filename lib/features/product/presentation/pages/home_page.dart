@@ -6,6 +6,7 @@ import '../../../core/common/styles.dart';
 import '../../../core/common/utils.dart';
 import '../../../core/injection.dart' as di;
 import '../../../core/router/app_routes.dart';
+import '../../domain/entities/cart_item.dart';
 import '../bloc/product_bloc.dart';
 import '../widgets/add_edit_product_sheet.dart';
 import '../widgets/banner_widget.dart';
@@ -24,9 +25,16 @@ class _HomePageState extends State<HomePage> with RouteAware {
     context.read<ProductBloc>().add(FetchProductsEvent());
   }
 
+  void _loadCartItems() {
+    context.read<ProductBloc>().add(LoadCartItems());
+  }
+
   @override
   void initState() {
-    _fetchProducts();
+    _loadCartItems(); // Load cart items when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCartItems();
+    });
     super.initState();
   }
 
@@ -38,6 +46,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   @override
   void didPopNext() {
+    _loadCartItems();
     _fetchProducts();
   }
 
@@ -62,11 +71,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                   arguments: {'autofocusSearch': true},
                 ),
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined),
-            color: Theme.of(context).colorScheme.onSurface,
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
-          ),
+          _buildCartIconWithBadge(),
           IconButton(
             icon: const Icon(Icons.person_2_outlined),
             color: Theme.of(context).colorScheme.onSurface,
@@ -85,6 +90,69 @@ class _HomePageState extends State<HomePage> with RouteAware {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCartIconWithBadge() {
+    return BlocBuilder<ProductBloc, ProductState>(
+      buildWhen: (previous, current) {
+        // Only rebuild when cart-related states change
+        return current is CartLoaded ||
+            current is CartItemAdded ||
+            current is CartItemUpdated ||
+            current is CartItemRemoved ||
+            current is CartCleared;
+      },
+      builder: (context, state) {
+        int productCount = 0;
+
+        if (state is CartLoaded) {
+          // Count unique products instead of total quantity
+          productCount = state.cartItems.length;
+        }
+
+        return Stack(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.shopping_cart_outlined),
+              color: Theme.of(context).colorScheme.onSurface,
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+            ),
+            if (productCount > 0)
+              Positioned(
+                right: 6,
+                top: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.surface,
+                      width: 1,
+                    ),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
+                  child: Text(
+                    productCount > 9 ? '9+' : productCount.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -123,6 +191,9 @@ class _HomePageState extends State<HomePage> with RouteAware {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: BlocListener<ProductBloc, ProductState>(
               listener: (context, state) {
+                print('===========');
+                print(state);
+                print('===========');
                 if (state is DeleteProductSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Produk berhasil dihapus')),
@@ -132,6 +203,21 @@ class _HomePageState extends State<HomePage> with RouteAware {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Gagal menghapus produk')),
                   );
+                } else if (state is CartItemAdded) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Berhasil menambahkan produk ke keranjang'),
+                    ),
+                  );
+                  context.read<ProductBloc>().add(FetchProductsEvent());
+                  _loadCartItems(); // Refresh cart count after adding item
+                } else if (state is CartError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${state.message}')),
+                  );
+                  context.read<ProductBloc>().add(FetchProductsEvent());
+                } else if (state is CartLoaded) {
+                  context.read<ProductBloc>().add(FetchProductsEvent());
                 }
               },
               child: BlocBuilder<ProductBloc, ProductState>(
@@ -178,7 +264,17 @@ class _HomePageState extends State<HomePage> with RouteAware {
                             });
                           },
                           onAddToCart: () {
-                            // handle add to cart
+                            context.read<ProductBloc>().add(
+                              AddCartItemEvent(
+                                CartItem(
+                                  productId: product.id,
+                                  productName: product.name,
+                                  price: product.price.toDouble(),
+                                  quantity: 1,
+                                  imageUrl: product.pictureUrl,
+                                ),
+                              ),
+                            );
                           },
                           onDelete: () {
                             context.read<ProductBloc>().add(

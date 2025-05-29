@@ -68,3 +68,62 @@ class DeleteProductEvent extends ProductEvent {
   @override
   List<Object> get props => [id];
 }
+
+// CART
+class LoadCartItems extends ProductEvent {}
+
+class AddCartItemEvent extends ProductEvent {
+  final CartItem cartItem;
+
+  const AddCartItemEvent(this.cartItem);
+
+  @override
+  List<Object> get props => [cartItem];
+}
+
+class UpdateCartItemEvent extends ProductEvent {
+  final CartItem cartItem;
+
+  const UpdateCartItemEvent(this.cartItem);
+
+  @override
+  List<Object> get props => [cartItem];
+}
+
+class IncrementQuantity extends ProductEvent {
+  final String productId;
+
+  const IncrementQuantity(this.productId);
+
+  @override
+  List<Object> get props => [productId];
+}
+
+class DecrementQuantity extends ProductEvent {
+  final String productId;
+
+  const DecrementQuantity(this.productId);
+
+  @override
+  List<Object> get props => [productId];
+}
+
+class RemoveCartItemEvent extends ProductEvent {
+  final String productId;
+
+  const RemoveCartItemEvent(this.productId);
+
+  @override
+  List<Object> get props => [productId];
+}
+
+class BulkRemoveCartItemEvent extends ProductEvent {
+  final List<String> productIds;
+
+  const BulkRemoveCartItemEvent(this.productIds);
+
+  @override
+  List<Object?> get props => [productIds];
+}
+
+class ClearCartEvent extends ProductEvent {}

@@ -128,3 +128,52 @@ class ProductError extends ProductState {
   @override
   List<Object?> get props => [message];
 }
+
+// CART
+class CartLoading extends ProductState {}
+
+class CartLoaded extends ProductState {
+  final List<CartItem> cartItems;
+  final double totalPrice;
+  final int totalItems;
+
+  const CartLoaded({
+    required this.cartItems,
+    required this.totalPrice,
+    required this.totalItems,
+  });
+
+  @override
+  List<Object> get props => [cartItems, totalPrice, totalItems];
+}
+
+class CartError extends ProductState {
+  final String message;
+
+  const CartError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
+class CartItemAdded extends ProductState {
+  final CartItem cartItem;
+
+  const CartItemAdded(this.cartItem);
+
+  @override
+  List<Object> get props => [cartItem];
+}
+
+class CartItemUpdated extends ProductState {
+  final CartItem cartItem;
+
+  const CartItemUpdated(this.cartItem);
+
+  @override
+  List<Object> get props => [cartItem];
+}
+
+class CartItemRemoved extends ProductState {}
+
+class CartCleared extends ProductState {}

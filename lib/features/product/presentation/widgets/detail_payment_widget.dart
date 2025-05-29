@@ -107,9 +107,9 @@ class DetailPaymentWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   amount,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 32,
-                    color: Color(0xFF333333),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

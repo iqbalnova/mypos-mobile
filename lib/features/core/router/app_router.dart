@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/presentation/pages/login_page.dart';
 import '../../auth/presentation/pages/onboarding_page.dart';
+import '../../product/domain/entities/cart_item.dart';
 import '../../product/presentation/bloc/product_bloc.dart';
 import '../../product/presentation/pages/cart_page.dart';
 import '../../product/presentation/pages/category_management.dart';
 import '../../product/presentation/pages/list_product_page.dart';
 import '../../product/presentation/pages/payment_success.dart';
 import '../../product/presentation/pages/qris_payment_page.dart';
+import '../common/data_constant.dart';
 import '../injection.dart' as di;
 import '../presentation/pages/coming_soon_page.dart';
 import '../presentation/pages/main_screen.dart';
@@ -36,9 +38,12 @@ class AppRouter {
       case AppRoutes.listProduct:
         final args = settings.arguments as Map<String, dynamic>?;
         final autofocusSearch = args?['autofocusSearch'] ?? false;
-        page = ListProductPage(
-          locator: di.locator,
-          autofocusSearch: autofocusSearch,
+        page = BlocProvider(
+          create: (context) => di.locator<ProductBloc>(),
+          child: ListProductPage(
+            locator: di.locator,
+            autofocusSearch: autofocusSearch,
+          ),
         );
         break;
       case AppRoutes.categoryManagement:
@@ -48,13 +53,35 @@ class AppRouter {
         );
         break;
       case AppRoutes.cart:
-        page = const CartPage();
+        page = BlocProvider(
+          create: (context) => di.locator<ProductBloc>(),
+          child: const CartPage(),
+        );
         break;
       case AppRoutes.qrisPayment:
-        page = const QrisPaymentPage();
+        final args = settings.arguments as Map<String, dynamic>?;
+        final paymentMethod = args?['paymentMethod'] as PaymentMethod?;
+        final totalPrice = args?['totalPrice'] as double? ?? 0;
+        final cartItems = args?['cartItems'] as List<CartItem>;
+        page = QrisPaymentPage(
+          selectedPaymentMethod: paymentMethod!,
+          totalPrice: totalPrice,
+          cartItems: cartItems,
+        );
         break;
       case AppRoutes.paymentSuccess:
-        page = const PaymentSuccess();
+        final args = settings.arguments as Map<String, dynamic>?;
+        final paymentMethod = args?['paymentMethod'] as PaymentMethod?;
+        final totalPrice = args?['totalPrice'] as double? ?? 0;
+        final cartItems = args?['cartItems'] as List<CartItem>;
+        page = BlocProvider(
+          create: (context) => di.locator<ProductBloc>(),
+          child: PaymentSuccess(
+            selectedPaymentMethod: paymentMethod!,
+            totalPrice: totalPrice,
+            cartItems: cartItems,
+          ),
+        );
         break;
       case AppRoutes.comingSoon:
         page = const ComingSoonPage();

@@ -1,15 +1,49 @@
-class CartItem {
-  final String id;
-  final String name;
-  final String image;
-  final double price;
-  int quantity;
+import 'package:equatable/equatable.dart';
 
-  CartItem({
-    required this.id,
-    required this.name,
-    required this.image,
+class CartItem extends Equatable {
+  final int? id;
+  final String productId;
+  final String productName;
+  final String imageUrl;
+  final double price;
+  final int quantity;
+
+  const CartItem({
+    this.id,
+    required this.productId,
+    required this.productName,
+    required this.imageUrl,
     required this.price,
-    this.quantity = 1,
+    required this.quantity,
   });
+
+  CartItem copyWith({
+    int? id,
+    String? productId,
+    String? productName,
+    String? imageUrl,
+    double? price,
+    int? quantity,
+  }) {
+    return CartItem(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      imageUrl: imageUrl ?? this.imageUrl,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  double get totalPrice => price * quantity;
+
+  @override
+  List<Object?> get props => [
+    id,
+    productId,
+    productName,
+    imageUrl,
+    price,
+    quantity,
+  ];
 }

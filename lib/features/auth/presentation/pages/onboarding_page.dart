@@ -17,7 +17,7 @@ class OnboardingPage extends StatelessWidget {
           SizedBox(
             width: size.width,
             height: size.height,
-            child: Image.asset('assets/images/onboard.jpg', fit: BoxFit.cover),
+            child: Image.asset('assets/images/bg-login.png', fit: BoxFit.cover),
           ),
 
           Container(

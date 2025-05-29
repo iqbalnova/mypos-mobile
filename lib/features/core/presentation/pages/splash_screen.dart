@@ -61,7 +61,7 @@ class SplashScreenState extends State<SplashScreen>
         if (token != null && token.isNotEmpty) {
           Navigator.pushReplacementNamed(context, AppRoutes.main);
         } else {
-          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
         }
       }
     } catch (e) {
@@ -118,7 +118,7 @@ class SplashScreenState extends State<SplashScreen>
                         child: Icon(
                           Icons.point_of_sale,
                           size: 60.sp,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),

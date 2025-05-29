@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myposapp/features/core/injection.dart';
 import 'package:myposapp/features/core/router/app_routes.dart';
 
+import '../../../core/common/styles.dart';
 import '../../../core/helper/secure_storage_helper.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -46,7 +47,16 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: Text(
+          'Profile',
+          style: AppTextStyle.headline3(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+      ),
       body: Center(
         child: Card(
           margin: const EdgeInsets.symmetric(horizontal: 24),
