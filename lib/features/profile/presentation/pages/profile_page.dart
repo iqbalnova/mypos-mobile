@@ -50,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text(
           'Profile',
-          style: AppTextStyle.headline3(
+          style: AppTextStyle.headline2(
             color: Theme.of(context).colorScheme.onSurface,
           ),
         ),

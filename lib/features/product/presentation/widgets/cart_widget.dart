@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,14 +29,10 @@ class CartWidget extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.r),
               image: DecorationImage(
-                image: NetworkImage(item.imageUrl),
+                image: CachedNetworkImageProvider(item.imageUrl),
                 fit: BoxFit.cover,
               ),
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-            child: Icon(
-              Icons.image,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(width: 12.w),

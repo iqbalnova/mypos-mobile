@@ -128,70 +128,74 @@ class _MainScreenState extends State<MainScreen> {
                                   16,
                                   32,
                                 ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 4,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(2),
+                                child: SafeArea(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 40,
+                                        height: 4,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.circular(
+                                            2,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      children: [
-                                        _featureCard(
-                                          title: 'Kategori',
-                                          subtitle:
-                                              'Buat menu produk\nlebih rapi',
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                            showModalBottomSheet(
-                                              context: context,
-                                              isScrollControlled: true,
-                                              builder:
-                                                  (context) => BlocProvider(
-                                                    create:
-                                                        (context) =>
-                                                            di
-                                                                .locator<
-                                                                  ProductBloc
-                                                                >(),
-                                                    child:
-                                                        const AddCategorySheet(),
-                                                  ),
-                                            );
-                                          },
-                                        ),
-                                        _featureCard(
-                                          title: 'Produk',
-                                          subtitle:
-                                              'Tambahin makanan\natau minuman',
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                            showModalBottomSheet(
-                                              context: context,
-                                              isScrollControlled: true,
-                                              builder:
-                                                  (context) => BlocProvider(
-                                                    create:
-                                                        (context) =>
-                                                            di
-                                                                .locator<
-                                                                  ProductBloc
-                                                                >(),
-                                                    child:
-                                                        const AddEditProductSheet(),
-                                                  ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        children: [
+                                          _featureCard(
+                                            title: 'Kategori',
+                                            subtitle:
+                                                'Buat menu produk\nlebih rapi',
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              showModalBottomSheet(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                builder:
+                                                    (context) => BlocProvider(
+                                                      create:
+                                                          (context) =>
+                                                              di
+                                                                  .locator<
+                                                                    ProductBloc
+                                                                  >(),
+                                                      child:
+                                                          const AddCategorySheet(),
+                                                    ),
+                                              );
+                                            },
+                                          ),
+                                          _featureCard(
+                                            title: 'Produk',
+                                            subtitle:
+                                                'Tambahin makanan\natau minuman',
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              showModalBottomSheet(
+                                                context: context,
+                                                isScrollControlled: true,
+                                                builder:
+                                                    (context) => BlocProvider(
+                                                      create:
+                                                          (context) =>
+                                                              di
+                                                                  .locator<
+                                                                    ProductBloc
+                                                                  >(),
+                                                      child:
+                                                          const AddEditProductSheet(),
+                                                    ),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                    ],
+                                  ),
                                 ),
                               ),
                         );

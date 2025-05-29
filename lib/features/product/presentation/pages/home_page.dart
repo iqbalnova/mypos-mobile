@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                         maxCrossAxisExtent: 200.w,
                         mainAxisSpacing: 16.h,
                         crossAxisSpacing: 16.w,
-                        childAspectRatio: 0.6,
+                        childAspectRatio: 0.56,
                       ),
                       itemBuilder: (context, index) {
                         final product = products[index];

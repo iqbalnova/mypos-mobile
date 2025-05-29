@@ -1,7 +1,5 @@
 import 'package:path/path.dart';
-import 'package:sqflite_sqlcipher/sqflite.dart';
-
-import 'encryption_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -22,12 +20,7 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'cart_database.db');
 
-    return await openDatabase(
-      path,
-      version: 1,
-      password: EncryptionHelper.encrypt('product-password'),
-      onCreate: _onCreate,
-    );
+    return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -45,7 +38,9 @@ class DatabaseHelper {
   }
 
   Future<void> close() async {
-    final db = await database;
-    await db.close();
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
   }
 }

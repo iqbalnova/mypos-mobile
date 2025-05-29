@@ -77,61 +77,64 @@ class _CartPageState extends State<CartPage> {
 
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...paymentMethods.map(
-                    (method) => ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage(method.imageUrl),
-                        radius: 24,
-                      ),
-                      title: Text(method.title),
-                      trailing: Radio<int>(
-                        value: method.id,
-                        groupValue: selectedId,
-                        onChanged: (value) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...paymentMethods.map(
+                      (method) => ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: AssetImage(method.imageUrl),
+                          radius: 24,
+                        ),
+                        title: Text(method.title),
+                        trailing: Radio<int>(
+                          value: method.id,
+                          groupValue: selectedId,
+                          onChanged: (value) {
+                            setModalState(() {
+                              selectedId = value;
+                            });
+                          },
+                        ),
+                        onTap: () {
                           setModalState(() {
-                            selectedId = value;
+                            selectedId = method.id;
                           });
                         },
                       ),
-                      onTap: () {
-                        setModalState(() {
-                          selectedId = method.id;
-                        });
-                      },
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          textStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        textStyle: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        onPressed: () {
+                          final selectedMethod = paymentMethods.firstWhere(
+                            (method) => method.id == selectedId,
+                          );
+                          Navigator.pop(context, selectedMethod);
+                        },
+                        child: const Text('Pilih Metode'),
                       ),
-                      onPressed: () {
-                        final selectedMethod = paymentMethods.firstWhere(
-                          (method) => method.id == selectedId,
-                        );
-                        Navigator.pop(context, selectedMethod);
-                      },
-                      child: const Text('Pilih Metode'),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
